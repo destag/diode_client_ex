@@ -224,14 +224,17 @@ defmodule DiodeClient.Shell do
   end
 
   def get_account_roots(address, peak \\ peak()) do
-    peak_index = peak_number(peak)
-    address = Hash.to_address(address)
+    IO.inspect("DiodeClient.Shell.get_account_roots")
+    IO.inspect(peak, label: "peak")
+    IO.inspect(address, label: "hash")
+    peak_index = peak_number(peak) |> IO.inspect(label: "peak_index")
+    address = Hash.to_address(address) |> IO.inspect(label: "address")
 
     [root, roots] =
       await_all([
         fn -> get_account_root(address, peak) end,
         fn ->
-          case cached_rpc(["getaccountroots", peak_index, address]) do
+          case cached_rpc(["getaccountroots", peak_index+2, address]) do
             [roots] ->
               roots
 
@@ -244,7 +247,7 @@ defmodule DiodeClient.Shell do
       ])
 
     flush_keys = [
-      ["getaccountroots", peak_index, address],
+      ["getaccountroots", peak_index+2, address],
       ["getaccount", peak_index, address],
       ["getstateroots", peak_index]
     ]
